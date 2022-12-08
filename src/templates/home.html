@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>   
+<html>   
+<head>    
+<title>Noida Cloud Data Center</title>  
+
+<style>
+  
+  .red{
+      background-color:red;
+    }
+  .green{
+    background-color:green;
+  }
+  .yellow{
+    background-color:yellow;
+  }
+</style>
+<!-- icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script>   
+ 
+function welcome() {   
+window.open("https://www.asdadwda.com/");  
+}   
+</script> 
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"> </script>
+<!--<script type=text/javascript> 
+  $(function() { $("#outside1").click(function (event) {
+   $.getJSON('/outside1', { },   
+      function(data) { });
+      return true;
+    
+    }); }); 
+</script>   -->
+
+<!--<script>
+  $(document).ready(function(){
+    $("button").click(function(){
+      $.getJSON('/outside1', function(result){
+        
+          $("div").append(result + " ");
+         
+      });
+    });
+  });
+</script>-->
+<script>
+  
+  $(document).ready(function(){
+    var id=null;   
+    var buttonValue=null;
+
+    var data = {{ ledStatus | tojson }};
+    console.log(data);
+    var leds = JSON.parse(data);    
+    console.log(leds['LED1']);
+  
+
+    for (var key in leds) {
+      console.log(key);
+      buttonValue = document.getElementById(key);
+      val=leds[key]
+      console.log(buttonValue);
+  
+      switch( val ) {
+        
+        case "LED1-ON": case "LED2-ON": case "LED3-ON": case "LED4-ON":
+          $( "input[id="+key+"]" ).removeClass('green').addClass('red');
+          buttonValue.value="OFF"; 
+          break;
+        case "LED1-OFF": case "LED2-OFF": case "LED3-OFF": case "LED4-OFF":
+          $( "input[id="+key+"]" ).removeClass('red').addClass('green');           
+          buttonValue.value="ON";
+          break;      
+        default:
+          answer = "Massive or Tiny?";
+          console.log('no match found');
+      }      
+    }
+
+
+    $("input").click(function(data){
+      console.log(this.id)
+      id=this.id;
+      console.log(id);
+      buttonValue = document.getElementById(id);
+      console.log(buttonValue.value);
+      url="/outside1/"+id+"-"+buttonValue.value;
+      console.log(url);
+    $.getJSON( url, function(data) {
+     // console.log(data)      
+    })
+    .done(function(result) {     
+      if(result=='OFF'){
+        console.log("inside red block");       
+        $( "input[id="+id+"]" ).removeClass('green').addClass('red');           
+        buttonValue.value="OFF";
+      }
+      else if(result=='ON'){        
+        console.log("inside green block");     
+        $( "input[id="+id+"]" ).removeClass('red').addClass('green');
+       // document.getElementById("LED1").addClass('green');  
+        buttonValue.value="ON";     
+      }//else{
+       // console.log("inside yellow block");
+       //$( "input[id="+id+"]" ).addClass('yellow');        
+        //buttonValue.value="OFF";
+      //}     
+    })
+    .fail(function() {
+      console.log( "error" );
+    })
+
+  });
+});
+</script> 
+
+</head>   
+<body style = "text-align:center">   
+  <!--<H1> Welcome To Home Automation</H1>-->
+  <div>
+    <div></div>
+    <object data="redColor" width="25" height="25"> </object>
+    <label for="LED1">LED1</label><input type="button" id = "LED1" value="OFF" >               
+    <label for="LED2">LED2</label><input type="button" id = "LED2" value="OFF" >           
+    <label for="LED3">LED3</label><input type="button" id = "LED3" value="OFF" >          
+    <label for="LED4">LED4</label><input type="button" id = "LED4" value="OFF" >  
+    
+    <div><H2>Fans </H2></div>
+  </div>
+</body>   
+</html>  
