@@ -80,13 +80,14 @@ while not mqttClient.connected_flag:
     time.sleep(1)
 
 
-
-def updateStats(data):
+@app.get("/updateProps/{data}")
+def updateStats(request: Request,data: str):
     '''Method use to update the status of controllable items '''
-    config = configparser.RawConfigParser()
-    config.read('./src/stats.properties')
-    spr=data.split('-')
+    
     print("updating status to property file")
+    config = configparser.RawConfigParser()
+    config.read('./src/stats.properties') #//TODO - error handling support
+    spr=data.split('-')   
     print(data,"--",spr[0].lower())    
     config.set('GNDASection', spr[0].lower(),data.upper())
     with open('./src/stats.properties', 'w') as configfile:
@@ -135,7 +136,7 @@ async def read_but(request: Request,id: str):
         status = result[0]
         if status == 0:
             print("Message Sent  to topic-- " +noida_topic_pub)
-            updateStats(id)#udpate the stats
+            #updateStats(id)#udpate the stats
             if buttonStatus[1]=="ON":
                 return "OFF"
             return "ON"  
@@ -156,13 +157,4 @@ def do_something(request: Request, uname: str = Form(...), psw: str = Form(...))
 
 @app.get("/items/", response_class=HTMLResponse)
 async def read_items():
-    return """
-    <html>
-        <head>
-            <title>Some HTML in here</title>
-        </head>
-        <body>
-            <h1>Look ma! HTML!</h1>
-        </body>
-    </html>
-    """    
+    return """   """    

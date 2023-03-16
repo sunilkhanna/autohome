@@ -104,8 +104,7 @@ client.on('message', (topic, message, packet) => {
   console.log('Received Message: ' + buttonStatus + '\nOn topic: ' + topic);
   kj=buttonID[0];
   buttonValue = document.getElementById(kj);
-  switch( buttonStatus ) {
-    
+  switch( buttonStatus ) {    
     case "LED1-ON": case "LED2-ON": case "LED3-ON": case "LED4-ON":
       $( "input[id="+buttonID[0]+"]" ).removeClass('green').addClass('red');
        buttonValue.value="OFF"; 
@@ -119,6 +118,17 @@ client.on('message', (topic, message, packet) => {
     default:          
       console.log('no match found');
   }
+  //Update the event status in properties file and button color accordingly
+  url="/updateProps/"+buttonStatus;
+  $.getJSON( url, function(buttonStatus) {
+    console.log('request sent to update properties')
+  })
+  .done(function(result) {  
+    console.log('returned response : ',result)
+   })
+  .fail(function() {
+    console.log( "error" );
+  })
 
 })
 
@@ -150,13 +160,11 @@ client.on('message', (topic, message, packet) => {
         
         case "LED1-ON": case "LED2-ON": case "LED3-ON": case "LED4-ON":
           $( "input[id="+key+"]" ).removeClass('green').addClass('red');
-          buttonValue.value="OFF"; 
-           
+          buttonValue.value="OFF";            
           break;
         case "LED1-OFF": case "LED2-OFF": case "LED3-OFF": case "LED4-OFF":
           $( "input[id="+key+"]" ).removeClass('red').addClass('green');           
-          buttonValue.value="ON";
-          
+          buttonValue.value="ON";          
           break;      
         default:          
           console.log('no match found');
