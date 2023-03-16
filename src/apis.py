@@ -55,7 +55,7 @@ def on_connect(mqttClient, userdata, flags, rc):
     # if reconnect after losing the connection with the broker, it will continue to subscribe to the raspberry/topic topic 
     if rc==0:
         mqttClient.connected_flag=True       
-        mqttClient.subscribe(noida_topic_pub)
+       # mqttClient.subscribe(noida_topic_pub)
        # print('connected..')
 
 def on_disconnect(mqttClient, userdata, rc):
@@ -68,7 +68,7 @@ mqttClient = mqtt.Client("HomeAutomation")
 mqttClient.on_connect = on_connect
 mqttClient.on_disconnect=on_disconnect
 mqttClient.on_message = on_message
-mqttClient.subscribe(noida_topic_pub)
+#mqttClient.subscribe(noida_topic_pub)
 mqttClient.loop_start()
 
 mqttClient.connect(mqttBroker,mqttPort)

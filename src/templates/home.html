@@ -14,6 +14,10 @@
   .yellow{
     background-color:yellow;
   }
+  .blue{
+    background-color:blue;
+  }
+
 </style>
 <!-- icon library -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -44,6 +48,86 @@ window.open("https://www.asdadwda.com/");
     });
   });
 </script>-->
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<script>
+    // Globally initializes an mqtt variable
+    console.log(mqtt)
+
+    const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8)
+
+//const host = 'ws://broker.hivemq.com:8000/mqtt'
+const host = 'wss://7c11acf6a6d04453856605869f574213.s2.eu.hivemq.cloud:8884/mqtt'
+
+const options = {
+  keepalive: 60,
+  clientId: clientId,
+  protocolId: 'MQTT',
+  protocolVersion: 4,
+  clean: true,
+  username:'sunilkhanna',
+  password:'Sunil321#',
+  reconnectPeriod: 1000,
+  connectTimeout: 30 * 1000,
+  will: {
+    topic: 'WillMsg',
+    payload: 'Connection Closed abnormally..!',
+    qos: 0,
+    retain: false
+  },
+}
+
+console.log('Connecting mqtt client')
+const client = mqtt.connect(host, options)
+
+client.on('error', (err) => {
+  console.log('Connection error: ', err)
+  client.end()
+})
+
+client.on('reconnect', () => {
+  console.log('Reconnecting...')
+})
+
+client.on('connect', () => {
+  console.log('Client connected:' + clientId)
+  // Subscribe
+  client.subscribe('nts11', { qos: 0 })
+})
+
+
+// Received
+client.on('message', (topic, message, packet) => {
+
+  buttonStatus=message.toString();
+  buttonID=buttonStatus.split("-");
+  console.log('Received Message: ' + buttonStatus + '\nOn topic: ' + topic);
+  kj=buttonID[0];
+  buttonValue = document.getElementById(kj);
+  switch( buttonStatus ) {
+    
+    case "LED1-ON": case "LED2-ON": case "LED3-ON": case "LED4-ON":
+      $( "input[id="+buttonID[0]+"]" ).removeClass('green').addClass('red');
+       buttonValue.value="OFF"; 
+       console.log("ON")
+      break;
+    case "LED1-OFF": case "LED2-OFF": case "LED3-OFF": case "LED4-OFF":
+      $( "input[id="+buttonID[0]+"]" ).removeClass('red').addClass('green');           
+      buttonValue.value="ON";
+      console.log("OFF")      
+      break;      
+    default:          
+      console.log('no match found');
+  }
+
+})
+
+
+
+</script>
+
+
 <script>
   
   $(document).ready(function(){
@@ -52,11 +136,12 @@ window.open("https://www.asdadwda.com/");
 
     var data = {{ ledStatus | tojson }};
     console.log(data);
-    var leds = JSON.parse(data);    
+    var leds = JSON.parse(data);      
     console.log(leds['LED1']);
   
 
     for (var key in leds) {
+      
       console.log(key);
       buttonValue = document.getElementById(key);
       val=leds[key]
@@ -67,13 +152,14 @@ window.open("https://www.asdadwda.com/");
         case "LED1-ON": case "LED2-ON": case "LED3-ON": case "LED4-ON":
           $( "input[id="+key+"]" ).removeClass('green').addClass('red');
           buttonValue.value="OFF"; 
+           
           break;
         case "LED1-OFF": case "LED2-OFF": case "LED3-OFF": case "LED4-OFF":
           $( "input[id="+key+"]" ).removeClass('red').addClass('green');           
           buttonValue.value="ON";
+          
           break;      
-        default:
-          answer = "Massive or Tiny?";
+        default:          
           console.log('no match found');
       }      
     }
@@ -81,17 +167,16 @@ window.open("https://www.asdadwda.com/");
 
     $("input").click(function(data){
       console.log(this.id)
-      id=this.id;
+       id=this.id;
       console.log(id);
       buttonValue = document.getElementById(id);
       console.log(buttonValue.value);
       url="/outside1/"+id+"-"+buttonValue.value;
       console.log(url);
     $.getJSON( url, function(data) {
-     // console.log(data)      
-    })
+     })
     .done(function(result) {     
-      if(result=='OFF'){
+     /** if(result=='OFF'){
         console.log("inside red block");       
         $( "input[id="+id+"]" ).removeClass('green').addClass('red');           
         buttonValue.value="OFF";
@@ -101,7 +186,9 @@ window.open("https://www.asdadwda.com/");
         $( "input[id="+id+"]" ).removeClass('red').addClass('green');
        // document.getElementById("LED1").addClass('green');  
         buttonValue.value="ON";     
-      }//else{
+      }
+      */
+      //else{
        // console.log("inside yellow block");
        //$( "input[id="+id+"]" ).addClass('yellow');        
         //buttonValue.value="OFF";
