@@ -16,9 +16,10 @@ ptvsd.enable_attach(address=("localhost",8098))
 #ptvsd.wait_for_attach()
 ptvsd.break_into_debugger()
 #MQTT broker
-#mqttBroker= "d48173f9aa524e8e90ec3bc0d1c5927d.s1.eu.hivemq.cloud" #"telebit.cloud"
-mqttBroker="broker.hivemq.com"
-mqttPort=1883 #38395
+mqttBroker = '7c11acf6a6d04453856605869f574213.s2.eu.hivemq.cloud'
+mqttPort=8883
+#mqttBroker="broker.hivemq.com"
+
 
 #-------Cloud-1 Noida setup----------//
 noida_topic_pub="ntp"
@@ -38,8 +39,7 @@ router = APIRouter()
 app = FastAPI()
 
 # the callback function, it will be triggered when receiving messages
-def on_message(mqttClient, userdata, msg):    
-    #mqttClient.publish( "nts",msg)   
+def on_message(mqttClient, userdata, msg):           
     print(f"{msg.topic} {msg.payload}")
     recvdMsg=str(msg.payload.decode("utf-8")).strip()
     print(recvdMsg.strip())
@@ -49,8 +49,7 @@ def on_message(mqttClient, userdata, msg):
         regainStats()    
 
 
-def on_connect(mqttClient, userdata, flags, rc):
-    #print(f"Connected with result code {rc}")
+def on_connect(mqttClient, userdata, flags, rc):    
     # subscribe, which need to put into on_connect
     # if reconnect after losing the connection with the broker, it will continue to subscribe to the raspberry/topic topic 
     if rc==0:
@@ -58,20 +57,23 @@ def on_connect(mqttClient, userdata, flags, rc):
        # mqttClient.subscribe(noida_topic_pub)
        # print('connected..')
 
-def on_disconnect(mqttClient, userdata, rc):
-    #print('client disconnected...')
+def on_disconnect(mqttClient, userdata, rc):    
     mqttClient.connected_flag=False
     
 
 mqtt.Client.connected_flag=False #create flag in class
 mqttClient = mqtt.Client("HomeAutomation")
+# enable TLS for secure connection
+
+mqttClient.tls_set(tls_version=mqtt.ssl.PROTOCOL_TLS)
+mqttClient.username_pw_set("sunilkhanna","Sunil321#")
 mqttClient.on_connect = on_connect
 mqttClient.on_disconnect=on_disconnect
 mqttClient.on_message = on_message
-#mqttClient.subscribe(noida_topic_pub)
 mqttClient.loop_start()
-
 mqttClient.connect(mqttBroker,mqttPort)
+
+
 
 while not mqttClient.connected_flag:
     print('wait in loop')
@@ -163,6 +165,4 @@ async def read_items():
             <h1>Look ma! HTML!</h1>
         </body>
     </html>
-    """
-
-
+    """    
